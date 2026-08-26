@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 940" width="1200" height="940" role="img" aria-label="Arquitetura do banking-ai: canal web, agente com guards e loop de tools, ledger determinístico sobre PostgreSQL, e os modelos da Groq usados em cada etapa" font-family="-apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" fill="#1B2430">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 940" width="1240" height="940" role="img" aria-label="Arquitetura do banking-ai: canal web, agente com guards e loop de tools, ledger determinístico sobre PostgreSQL, e os modelos da Groq usados em cada etapa" font-family="-apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" fill="#1B2430">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#4B5563"/>
@@ -6,29 +6,31 @@
   </defs>
 
   <!-- canvas -->
-  <rect x="0" y="0" width="1200" height="940" rx="18" fill="#F6F7F9" stroke="#D9DEE4"/>
+  <rect x="0" y="0" width="1240" height="940" rx="18" fill="#F6F7F9" stroke="#D9DEE4"/>
 
   <!-- ===================== CANAL ===================== -->
   <text x="40" y="92" font-size="12" font-weight="700" letter-spacing="1.5" fill="#075E54">CANAL (PLUGÁVEL)</text>
-  <rect x="40" y="110" width="250" height="220" rx="16" fill="#FFFFFF" stroke="#CBD2DA"/>
+  <rect x="40" y="110" width="250" height="246" rx="16" fill="#FFFFFF" stroke="#CBD2DA"/>
   <path d="M40,126 a16,16 0 0 1 16,-16 h218 a16,16 0 0 1 16,16 v24 h-250 z" fill="#075E54"/>
   <text x="60" y="136" font-size="12" font-weight="700" fill="#FFFFFF">Dev + Eficiente (Banking)</text>
-  <rect x="52" y="164" width="172" height="32" rx="8" fill="#FFFFFF" stroke="#E1E6EA"/>
-  <text x="62" y="184" font-size="11">Seu saldo é R$ 2.450,00.</text>
-  <rect x="118" y="206" width="160" height="32" rx="8" fill="#DCF8C6" stroke="#CFE9B9"/>
-  <text x="128" y="226" font-size="11">manda 50 pro alberto</text>
-  <rect x="52" y="248" width="226" height="48" rx="8" fill="#FFFFFF" stroke="#E1E6EA"/>
-  <text x="62" y="268" font-size="11">Confirma Pix de R$ 50,00 para</text>
-  <text x="62" y="284" font-size="11">Alberto Souza? Responda sim ou não.</text>
-  <text x="40" y="352" font-size="11" font-family="ui-monospace, Menlo, Consolas, monospace" fill="#5B6673">static/index.html · channels/web.py</text>
+  <rect x="118" y="164" width="160" height="32" rx="8" fill="#DCF8C6" stroke="#CFE9B9"/>
+  <text x="128" y="184" font-size="11">manda 50 pro alberto</text>
+  <rect x="52" y="206" width="226" height="48" rx="8" fill="#FFFFFF" stroke="#E1E6EA"/>
+  <text x="62" y="226" font-size="11">Confirma Pix de R$ 50,00 para</text>
+  <text x="62" y="242" font-size="11">Alberto Souza? Responda sim ou não.</text>
+  <rect x="222" y="264" width="56" height="32" rx="8" fill="#DCF8C6" stroke="#CFE9B9"/>
+  <text x="250" y="284" font-size="11" text-anchor="middle">sim</text>
+  <rect x="52" y="306" width="200" height="32" rx="8" fill="#FFFFFF" stroke="#E1E6EA"/>
+  <text x="62" y="326" font-size="11">Feito! Saldo: R$ 2.450,00.</text>
+  <text x="40" y="378" font-size="11" font-family="ui-monospace, Menlo, Consolas, monospace" fill="#5B6673">static/index.html · channels/web.py</text>
 
-  <circle cx="46" cy="380" r="4" fill="#F47B20"/>
-  <text x="56" y="384" font-size="11" fill="#5B6673">/api/audio → whisper-large-v3-turbo</text>
-  <circle cx="46" cy="400" r="4" fill="#F47B20"/>
-  <text x="56" y="404" font-size="11" fill="#5B6673">/api/document → qwen3.6-27b (visão)</text>
+  <circle cx="46" cy="406" r="4" fill="#F47B20"/>
+  <text x="56" y="410" font-size="11" fill="#5B6673">/api/audio → whisper-large-v3-turbo</text>
+  <circle cx="46" cy="426" r="4" fill="#F47B20"/>
+  <text x="56" y="430" font-size="11" fill="#5B6673">/api/document → qwen3.6-27b (visão)</text>
 
-  <text x="40" y="440" font-size="11" fill="#5B6673">Outro canal (WhatsApp, Telegram) é outro</text>
-  <text x="40" y="456" font-size="11" fill="#5B6673">adaptador em channels/; o agente não muda.</text>
+  <text x="40" y="466" font-size="11" fill="#5B6673">Outro canal (WhatsApp, Telegram) é outro</text>
+  <text x="40" y="482" font-size="11" fill="#5B6673">adaptador em channels/; o agente não muda.</text>
 
   <!-- WebSocket -> agente -->
   <line x1="290" y1="137" x2="386" y2="137" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arrow)"/>
@@ -50,8 +52,8 @@
   <!-- 2. losango sim/não -->
   <polygon points="410,232 560,198 710,232 560,266" fill="#FFFFFF" stroke="#4F5BD5"/>
   <text x="560" y="236" font-size="12" text-anchor="middle" font-weight="700">"sim" ou "não" com intent pendente?</text>
-  <polyline points="710,232 1080,232 1080,277" fill="none" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arrow)"/>
-  <text x="895" y="224" font-size="11" text-anchor="middle" fill="#4B5563">sim · executa ou cancela o payload gravado, sem LLM</text>
+  <polyline points="710,232 1120,232 1120,277" fill="none" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="915" y="224" font-size="11" text-anchor="middle" fill="#4B5563">sim · executa ou cancela o payload gravado, sem LLM</text>
   <line x1="560" y1="266" x2="560" y2="297" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arrow)"/>
   <text x="572" y="288" font-size="11" fill="#4B5563">não</text>
 
@@ -67,10 +69,10 @@
   <!-- 4. executor -->
   <rect x="390" y="384" width="340" height="54" rx="8" fill="#E8EEF4" stroke="#3B5B7A"/>
   <text x="404" y="406" font-size="14" font-weight="700">ToolExecutor · tools.py</text>
-  <text x="404" y="425" font-size="11" fill="#5B6673">revalida os argumentos com Pydantic: limites, tipos, extra=forbid</text>
-  <line x1="730" y1="411" x2="827" y2="411" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arrow)"/>
-  <rect x="722" y="393" width="114" height="14" rx="4" fill="#F6F7F9"/>
-  <text x="779" y="404" font-size="11" text-anchor="middle" fill="#4B5563">consulta · cria intent</text>
+  <text x="404" y="425" font-size="11" fill="#5B6673">revalida os argumentos com Pydantic (limites, tipos)</text>
+  <line x1="730" y1="411" x2="867" y2="411" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="820" y="401" font-size="11" text-anchor="middle" fill="#4B5563">consulta</text>
+  <text x="820" y="427" font-size="11" text-anchor="middle" fill="#4B5563">cria intent</text>
   <line x1="560" y1="438" x2="560" y2="469" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arrow)"/>
   <text x="572" y="460" font-size="11" fill="#4B5563">tool result</text>
 
@@ -78,9 +80,9 @@
   <polygon points="400,506 560,472 720,506 560,540" fill="#FFFFFF" stroke="#4F5BD5"/>
   <text x="560" y="510" font-size="12" text-anchor="middle" font-weight="700">o backend já sabe a resposta?</text>
   <polyline points="560,540 560,560 472,560 472,577" fill="none" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arrow)"/>
-  <polyline points="560,560 648,560 648,577" fill="none" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <polyline points="560,560 600,560 600,577" fill="none" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arrow)"/>
   <text x="506" y="555" font-size="11" text-anchor="middle" fill="#4B5563">sim</text>
-  <text x="614" y="555" font-size="11" text-anchor="middle" fill="#4B5563">não</text>
+  <text x="582" y="555" font-size="11" text-anchor="middle" fill="#4B5563">não</text>
 
   <!-- 6a. render -->
   <rect x="390" y="580" width="165" height="76" rx="8" fill="#FDE7F0" stroke="#C2417A"/>
@@ -92,9 +94,9 @@
   <!-- 6b. structured output -->
   <rect x="565" y="580" width="165" height="76" rx="8" fill="#E6F0FF" stroke="#2F6FD6"/>
   <text x="579" y="602" font-size="14" font-weight="700">structured output</text>
-  <text x="579" y="619" font-size="11" fill="#5B6673">response_format json_schema</text>
-  <text x="579" y="633" font-size="11" fill="#5B6673">strict: true</text>
-  <text x="579" y="647" font-size="11" fill="#5B6673">(constrained decoding)</text>
+  <text x="579" y="619" font-size="11" fill="#5B6673">json_schema · strict: true</text>
+  <text x="579" y="633" font-size="11" fill="#5B6673">(constrained decoding)</text>
+  <text x="579" y="647" font-size="11" fill="#5B6673">só quando há o que decidir</text>
   <rect x="640" y="570" width="100" height="20" rx="10" fill="#F47B20"/>
   <text x="690" y="584" font-size="11" text-anchor="middle" fill="#FFFFFF" font-weight="700">gpt-oss-120b</text>
   <line x1="648" y1="656" x2="648" y2="669" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arrow)"/>
@@ -115,44 +117,44 @@
   <text x="310" y="520" font-size="11" text-anchor="middle" fill="#4B5563" transform="rotate(-90 310 520)">resposta + log de eventos</text>
 
   <!-- ===================== BACKEND DETERMINÍSTICO ===================== -->
-  <text x="830" y="265" font-size="12" font-weight="700" letter-spacing="1.5" fill="#3B5B7A">CÓDIGO DETERMINÍSTICO</text>
-  <rect x="830" y="280" width="330" height="190" rx="12" fill="#E8EEF4" stroke="#3B5B7A"/>
-  <text x="850" y="306" font-size="14" font-weight="700">ledger.py</text>
-  <text x="850" y="332" font-size="12">saldo derivado: SUM(créditos) − SUM(débitos)</text>
-  <text x="850" y="354" font-size="12">intents em duas fases: propor (pendente) → confirmar</text>
-  <text x="850" y="376" font-size="12">confirm_intent: FOR UPDATE na intent e na conta</text>
-  <text x="850" y="398" font-size="12">lançamentos append-only, UNIQUE (intent_id)</text>
-  <text x="850" y="420" font-size="12">resolve_recipient: chave exata ou nome único</text>
-  <text x="850" y="450" font-size="11" fill="#5B6673">user_id vem da sessão; o modelo nunca o informa</text>
+  <text x="870" y="265" font-size="12" font-weight="700" letter-spacing="1.5" fill="#3B5B7A">CÓDIGO DETERMINÍSTICO</text>
+  <rect x="870" y="280" width="330" height="190" rx="12" fill="#E8EEF4" stroke="#3B5B7A"/>
+  <text x="890" y="306" font-size="14" font-weight="700">ledger.py</text>
+  <text x="890" y="332" font-size="12">saldo derivado: SUM(créditos) − SUM(débitos)</text>
+  <text x="890" y="354" font-size="12">intents em duas fases: propor (pendente) → confirmar</text>
+  <text x="890" y="376" font-size="12">confirm_intent: FOR UPDATE na intent e na conta</text>
+  <text x="890" y="398" font-size="12">lançamentos append-only, UNIQUE (intent_id)</text>
+  <text x="890" y="420" font-size="12">resolve_recipient: chave exata ou nome único</text>
+  <text x="890" y="450" font-size="11" fill="#5B6673">user_id vem da sessão; o modelo nunca o informa</text>
 
-  <line x1="995" y1="470" x2="995" y2="515" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arrow)"/>
-  <ellipse cx="995" cy="624" rx="120" ry="16" fill="#26507A"/>
-  <rect x="875" y="536" width="240" height="88" fill="#336791"/>
-  <ellipse cx="995" cy="536" rx="120" ry="16" fill="#4C7FB0"/>
-  <text x="995" y="576" font-size="14" font-weight="700" text-anchor="middle" fill="#FFFFFF">PostgreSQL</text>
-  <text x="995" y="595" font-size="11" text-anchor="middle" fill="#DCE8F3">contas · intents · lancamentos</text>
-  <text x="995" y="611" font-size="11" text-anchor="middle" fill="#DCE8F3">o último guardrail: ACID, locks, constraints</text>
+  <line x1="1035" y1="470" x2="1035" y2="515" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <ellipse cx="1035" cy="624" rx="120" ry="16" fill="#26507A"/>
+  <rect x="915" y="536" width="240" height="88" fill="#336791"/>
+  <ellipse cx="1035" cy="536" rx="120" ry="16" fill="#4C7FB0"/>
+  <text x="1035" y="576" font-size="14" font-weight="700" text-anchor="middle" fill="#FFFFFF">PostgreSQL</text>
+  <text x="1035" y="595" font-size="11" text-anchor="middle" fill="#DCE8F3">contas · intents · lancamentos</text>
+  <text x="1035" y="611" font-size="11" text-anchor="middle" fill="#DCE8F3">o último guardrail: ACID, locks, constraints</text>
 
   <!-- ===================== GROQ ===================== -->
-  <rect x="350" y="800" width="810" height="110" rx="12" fill="#FFF1E6" stroke="#F47B20"/>
+  <rect x="350" y="800" width="850" height="110" rx="12" fill="#FFF1E6" stroke="#F47B20"/>
   <text x="370" y="826" font-size="12" font-weight="700" letter-spacing="1.5" fill="#C85F0E">GROQ · ÚNICA DEPENDÊNCIA EXTERNA</text>
-  <text x="1140" y="826" font-size="11" text-anchor="end" fill="#8A5A2B">selo laranja = etapa que chama a Groq</text>
+  <text x="1180" y="826" font-size="11" text-anchor="end" fill="#8A5A2B">selo laranja = etapa que chama a Groq</text>
 
   <rect x="370" y="842" width="185" height="54" rx="8" fill="#FFFFFF" stroke="#F47B20"/>
   <text x="462" y="863" font-size="12" font-weight="700" text-anchor="middle" font-family="ui-monospace, Menlo, Consolas, monospace">openai/gpt-oss-120b</text>
   <text x="462" y="882" font-size="11" text-anchor="middle" fill="#5B6673">tool calling + strict</text>
 
-  <rect x="570" y="842" width="185" height="54" rx="8" fill="#FFFFFF" stroke="#F47B20"/>
-  <text x="662" y="863" font-size="12" font-weight="700" text-anchor="middle" font-family="ui-monospace, Menlo, Consolas, monospace">llama-prompt-guard-2</text>
-  <text x="662" y="882" font-size="11" text-anchor="middle" fill="#5B6673">probabilidade de injection</text>
+  <rect x="575" y="842" width="185" height="54" rx="8" fill="#FFFFFF" stroke="#F47B20"/>
+  <text x="667" y="863" font-size="12" font-weight="700" text-anchor="middle" font-family="ui-monospace, Menlo, Consolas, monospace">llama-prompt-guard-2</text>
+  <text x="667" y="882" font-size="11" text-anchor="middle" fill="#5B6673">probabilidade de injection</text>
 
-  <rect x="770" y="842" width="185" height="54" rx="8" fill="#FFFFFF" stroke="#F47B20"/>
-  <text x="862" y="863" font-size="12" font-weight="700" text-anchor="middle" font-family="ui-monospace, Menlo, Consolas, monospace">qwen/qwen3.6-27b</text>
-  <text x="862" y="882" font-size="11" text-anchor="middle" fill="#5B6673">visão: foto do boleto → JSON</text>
+  <rect x="780" y="842" width="185" height="54" rx="8" fill="#FFFFFF" stroke="#F47B20"/>
+  <text x="872" y="863" font-size="12" font-weight="700" text-anchor="middle" font-family="ui-monospace, Menlo, Consolas, monospace">qwen/qwen3.6-27b</text>
+  <text x="872" y="882" font-size="11" text-anchor="middle" fill="#5B6673">visão: foto do boleto → JSON</text>
 
-  <rect x="970" y="842" width="185" height="54" rx="8" fill="#FFFFFF" stroke="#F47B20"/>
-  <text x="1062" y="863" font-size="12" font-weight="700" text-anchor="middle" font-family="ui-monospace, Menlo, Consolas, monospace">whisper-large-v3-turbo</text>
-  <text x="1062" y="882" font-size="11" text-anchor="middle" fill="#5B6673">áudio → texto</text>
+  <rect x="985" y="842" width="185" height="54" rx="8" fill="#FFFFFF" stroke="#F47B20"/>
+  <text x="1077" y="863" font-size="12" font-weight="700" text-anchor="middle" font-family="ui-monospace, Menlo, Consolas, monospace">whisper-large-v3-turbo</text>
+  <text x="1077" y="882" font-size="11" text-anchor="middle" fill="#5B6673">áudio → texto</text>
 
   <!-- ===================== LEGENDA ===================== -->
   <text x="40" y="826" font-size="12" font-weight="700" letter-spacing="1.5" fill="#5B6673">LEGENDA</text>
@@ -166,4 +168,6 @@
   <text x="252" y="851" font-size="11">texto por template</text>
   <rect x="230" y="862" width="14" height="14" rx="3" fill="#336791"/>
   <text x="252" y="873" font-size="11">banco de dados</text>
+  <rect x="230" y="884" width="14" height="14" rx="3" fill="#4F5BD5"/>
+  <text x="252" y="895" font-size="11">resultado (AgentReply)</text>
 </svg>

@@ -20,6 +20,57 @@ O que dá para fazer na interface (um front estilo WhatsApp, com um painel ao la
 
 O canal é uma camada trocável: `channels/base.py` define o contrato (`Processor`, `TextMessage`, `DocumentMessage`) e o front web é um adaptador. WhatsApp ou Telegram entrariam como outro arquivo em `channels/`, sem mexer no agente.
 
+## Setup
+
+Você precisa de Docker com Compose e de uma chave da [Groq](https://console.groq.com) (o tier gratuito serve; veja a nota de rate limit no fim desta seção). Nada mais é instalado na máquina: Python, dependências e Postgres vivem nos containers.
+
+```bash
+git clone <este repositório> && cd banking-ai
+cp .env.example .env          # edite e coloque sua GROQ_API_KEY
+docker compose up --build     # Postgres + app
+```
+
+Na primeira subida o app aplica `db/schema.sql` e carrega `db/seeds.sql` (usuário Daniel Romero com R$ 2.500,00 e quatro contatos). Depois disso:
+
+- **Front:** http://localhost:8000 (o container escuta em `0.0.0.0`, então de outra máquina na rede é `http://<ip-da-maquina>:8000`).
+- **API HTTP:** http://localhost:8000/docs (Swagger) e `/redoc`.
+- **Postgres:** `localhost:5433`, usuário, senha e banco `banking`. Para ver o ledger durante uma demo:
+
+  ```bash
+  docker compose exec db psql -U banking -d banking -c 'select * from lancamentos order by id desc limit 5'
+  ```
+
+- **Voltar ao estado inicial:** botão ⟲ no header do front ou `curl -X POST localhost:8000/api/admin/reset`. Trunca as tabelas, reaplica os seeds e zera as sessões.
+- **Parar:** `docker compose down` (os dados ficam no volume `pgdata`; `docker compose down -v` apaga).
+
+Variáveis opcionais no `.env` (defaults em `src/banking_ai/config.py`): `GROQ_MODEL`, `GROQ_VISION_MODEL`, `GROQ_WHISPER_MODEL`, `GROQ_GUARD_MODEL`, `DEMO_USER_PIX_KEY` (troca o usuário logado por outra chave dos seeds), `INJECTION_THRESHOLD`.
+
+Três avisos práticos:
+
+- O botão de microfone só funciona em contexto seguro (HTTPS ou `localhost`). Pelo IP da rede o resto funciona, o áudio não; no Safari há a opção Desenvolvedor → WebRTC → "Permitir captura de mídia em sites não seguros".
+- Uma foto de boleto para testar o fluxo de visão está em `demo/boleto-exemplo.png`.
+- No tier gratuito da Groq o limite é 8.000 tokens por minuto. Uma conversa normal cabe; mensagens em rajada recebem 429, e o app avisa "espera alguns segundos". Deixe uns 10 s entre mensagens.
+
+Os ícones do front vêm da [Lucide](https://lucide.dev) (licença ISC), vendorizada em `src/banking_ai/static/lucide.min.js`, para a demo funcionar sem internet além da Groq.
+
+## Desenvolvimento
+
+```bash
+uv sync
+docker compose up -d db
+uv run uvicorn banking_ai.app:app --reload
+```
+
+Checks (Ruff, Flake8 com as regras anti-slop, mypy strict) e testes:
+
+```bash
+uv run ruff check src tests && uv run flake8 src tests && uv run mypy
+uv run pytest                                                     # unitários + ledger no Postgres do compose
+RUN_INTEGRATION=1 uv run pytest tests/test_integration_groq.py    # conversa completa contra a Groq
+```
+
+Os testes de ledger resetam o banco do compose a cada caso. `TEST_DATABASE_URL` aponta para outro Postgres se precisar. Os testes do agente usam um LLM roteirizado (`tests/conftest.py`, `FakeLLM`) em vez de mocks de módulo.
+
 ## Como uma mensagem é processada
 
 1. O guard de entrada pede ao Llama Prompt Guard 2 um score de prompt injection e o passa por um validator do Guardrails AI. Acima do limiar, a resposta é uma recusa e o modelo principal nem é chamado.
@@ -67,21 +118,6 @@ Regras que valem para todas:
 | Modelo "inventar" uma tool (`recusar`, `confirmar_intent`) | `ToolError(ferramenta_desconhecida)` orienta a usar `acao` e encerra a rodada |
 
 Guardrails AI cobre a camada probabilística (formato, injection, PII). As garantias financeiras são Pydantic, código determinístico e Postgres.
-
-## Rodando
-
-```bash
-cp .env.example .env        # coloque sua GROQ_API_KEY
-docker compose up --build   # Postgres + app em http://localhost:8000
-```
-
-O Postgres fica exposto em `localhost:5433`, com usuário, senha e banco `banking`:
-
-```bash
-docker compose exec db psql -U banking -d banking -c 'select * from lancamentos order by id desc limit 5'
-```
-
-Os ícones do front vêm da [Lucide](https://lucide.dev) (licença ISC), vendorizada em `src/banking_ai/static/lucide.min.js` e servida em `/static`, para a demo continuar funcionando sem internet além da Groq. Uma imagem de boleto para testar o fluxo de visão está em `demo/boleto-exemplo.png`. O botão de microfone depende de contexto seguro no navegador (HTTPS ou `localhost`); acessando pelo IP da rede ele não funciona, o resto sim.
 
 ## Estado inicial (seeds)
 
@@ -176,21 +212,3 @@ Português, de propósito, em três lugares:
 - substantivos do domínio sem tradução limpa e as colunas do banco: `pix`, `boleto`, `intent`, `linha_digitavel`, `chave_pix`, `contas`, `lancamentos`.
 
 Assim `SendPix.destinatario`, `ledger.confirm_intent` e `LogEvent(kind="tool_call", title="tool call · enviar_pix")` convivem sem parecer tradução literal.
-
-## Desenvolvimento
-
-```bash
-uv sync
-docker compose up -d db
-uv run uvicorn banking_ai.app:app --reload
-```
-
-Checks (Ruff, Flake8 com as regras anti-slop, mypy strict) e testes:
-
-```bash
-uv run ruff check src tests && uv run flake8 src tests && uv run mypy
-uv run pytest                                                     # unitários + ledger no Postgres do compose
-RUN_INTEGRATION=1 uv run pytest tests/test_integration_groq.py    # conversa completa contra a Groq
-```
-
-Os testes de ledger resetam o banco do compose a cada caso. `TEST_DATABASE_URL` aponta para outro Postgres se precisar. Os testes do agente usam um LLM roteirizado (`tests/conftest.py`, `FakeLLM`) em vez de mocks de módulo.

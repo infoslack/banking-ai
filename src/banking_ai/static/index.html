@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dev + Eficiente (Banking)</title>
+<link rel="icon" href="data:,">
+<script src="/static/lucide.min.js"></script>
+<style>
+  :root {
+    /* tema claro (WhatsApp light) */
+    --header-bg: #075E54; --header-fg: #fff; --green: #128C7E; --green-light: #25D366;
+    --chat-bg: #ECE5DD; --chat-dots: rgba(0,0,0,.04);
+    --user-bubble: #DCF8C6; --agent-bubble: #FFFFFF; --system-bubble: #fff3cd; --system-fg: #6b5300;
+    --text: #111; --muted: #667; --shadow: rgba(0,0,0,.12);
+    --footer-bg: #f0f0f0; --input-bg: #fff; --input-border: #ccc; --btn-bg: #fff; --btn-fg: #54656f;
+    --confirm-bg: #f6f2e8; --divider: #ddd; --page-bg: #d9d9d9;
+    --log-bg: #f7f9fb; --log-fg: #1f2933; --log-dim: #6b7a88; --log-border: #dde3e8;
+    --event-bg: #ffffff; --event-fg: #3b4752; --event-default: #b8c2cc; --tag-fg: #fff;
+    --log-btn-bg: #eef2f5; --log-btn-fg: #2b3a48; --log-btn-border: #cfd8e0; --error-bg: #fff1f1;
+    --chat-font: 18px; --log-font: 14px;
+  }
+  :root[data-theme="dark"] {
+    --header-bg: #202c33; --header-fg: #e9edef; --green: #00a884; --green-light: #00a884;
+    --chat-bg: #0b141a; --chat-dots: rgba(255,255,255,.04);
+    --user-bubble: #005c4b; --agent-bubble: #202c33; --system-bubble: #3b3a2a; --system-fg: #f3e8b0;
+    --text: #e9edef; --muted: #8696a0; --shadow: rgba(0,0,0,.4);
+    --footer-bg: #202c33; --input-bg: #2a3942; --input-border: #2a3942; --btn-bg: #2a3942; --btn-fg: #aebac1;
+    --confirm-bg: #111b21; --divider: #2a3942; --page-bg: #0b141a;
+    --log-bg: #0f1419; --log-fg: #d6dde4; --log-dim: #7d8a96; --log-border: #22303a;
+    --event-bg: #141c24; --event-fg: #b9c4cf; --event-default: #445; --tag-fg: #cfe;
+    --log-btn-bg: #1b2733; --log-btn-fg: #cfd8e3; --log-btn-border: #2c3b48; --error-bg: #2a1517;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --header-bg: #202c33; --header-fg: #e9edef; --green: #00a884; --green-light: #00a884;
+      --chat-bg: #0b141a; --chat-dots: rgba(255,255,255,.04);
+      --user-bubble: #005c4b; --agent-bubble: #202c33; --system-bubble: #3b3a2a; --system-fg: #f3e8b0;
+      --text: #e9edef; --muted: #8696a0; --shadow: rgba(0,0,0,.4);
+      --footer-bg: #202c33; --input-bg: #2a3942; --input-border: #2a3942; --btn-bg: #2a3942; --btn-fg: #aebac1;
+      --confirm-bg: #111b21; --divider: #2a3942; --page-bg: #0b141a;
+      --log-bg: #0f1419; --log-fg: #d6dde4; --log-dim: #7d8a96; --log-border: #22303a;
+      --event-bg: #141c24; --event-fg: #b9c4cf; --event-default: #445; --tag-fg: #cfe;
+      --log-btn-bg: #1b2733; --log-btn-fg: #cfd8e3; --log-btn-border: #2c3b48; --error-bg: #2a1517;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: var(--text); background: var(--page-bg); height: 100vh; display: grid; grid-template-columns: minmax(360px, 520px) minmax(0, 1fr); overflow: hidden; }
+  body.no-log { grid-template-columns: 1fr; }
+  body.no-log #log { display: none; }
+
+  /* ---------- phone / chat ---------- */
+  #phone { display: flex; flex-direction: column; height: 100vh; min-width: 0; overflow: hidden; background: var(--chat-bg); border-right: 1px solid var(--log-border); }
+  header { background: var(--header-bg); color: var(--header-fg); padding: 10px 14px; display: flex; align-items: center; gap: 12px; }
+  header .avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--green-light); display: grid; place-items: center; }
+  header > div:nth-child(2) { min-width: 0; }
+  header .name { font-weight: 600; font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  header .status { font-size: 12px; opacity: .85; }
+  header .actions { margin-left: auto; display: flex; gap: 6px; flex-shrink: 0; }
+  header button { background: transparent; color: var(--header-fg); border: 0; border-radius: 50%; width: 38px; height: 38px; display: grid; place-items: center; cursor: pointer; }
+  header button svg, footer button svg, #confirm svg { width: 22px; height: 22px; }
+  header .avatar svg { width: 24px; height: 24px; color: #fff; }
+  header button:hover { background: rgba(255,255,255,.15); }
+
+  #messages { flex: 1; overflow-y: auto; padding: 14px 12px; display: flex; flex-direction: column; gap: 6px;
+    background-image: radial-gradient(circle at 1px 1px, var(--chat-dots) 1px, transparent 0); background-size: 18px 18px; }
+  .bubble { max-width: 84%; padding: 8px 12px; border-radius: 10px; font-size: var(--chat-font); line-height: 1.35; white-space: pre-wrap; word-wrap: break-word; box-shadow: 0 1px 1px var(--shadow); position: relative; color: var(--text); }
+  .bubble.user { align-self: flex-end; background: var(--user-bubble); border-bottom-right-radius: 2px; }
+  .bubble.agent { align-self: flex-start; background: var(--agent-bubble); border-bottom-left-radius: 2px; }
+  .bubble.system { align-self: center; background: var(--system-bubble); font-size: 13px; color: var(--system-fg); }
+  .bubble .time { display: block; text-align: right; font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .bubble.recusar { border-left: 4px solid #d33; }
+  .bubble.pedir_confirmacao { border-left: 4px solid #e6a100; }
+  .bubble .source { font-size: 12px; color: var(--muted); display: block; margin-bottom: 2px; }
+  .bubble.image { padding: 4px; max-width: 300px; }
+  .bubble.image img { display: block; width: 100%; max-height: 320px; object-fit: cover; border-radius: 8px; cursor: zoom-in; }
+  .bubble.image .caption { display: block; padding: 6px 8px 0; font-size: 14px; color: var(--muted); }
+  .bubble.image .time { position: absolute; right: 12px; bottom: 8px; margin: 0; color: #fff; text-shadow: 0 0 4px rgba(0,0,0,.7); }
+  .bubble.image.captioned .time { position: static; color: var(--muted); text-shadow: none; padding: 0 8px 4px; }
+  .typing { align-self: flex-start; background: var(--agent-bubble); border-radius: 10px; padding: 10px 14px; display: none; }
+  .typing span { display: inline-block; width: 8px; height: 8px; margin: 0 2px; background: var(--muted); border-radius: 50%; animation: bounce 1.2s infinite; }
+  .typing span:nth-child(2) { animation-delay: .2s; } .typing span:nth-child(3) { animation-delay: .4s; }
+  @keyframes bounce { 0%, 60%, 100% { transform: translateY(0); opacity: .5; } 30% { transform: translateY(-5px); opacity: 1; } }
+
+  #confirm { display: none; gap: 8px; padding: 8px 12px; background: var(--confirm-bg); border-top: 1px solid var(--divider); }
+  #confirm button { flex: 1; padding: 10px; font-size: 16px; border: 0; border-radius: 8px; cursor: pointer; color: #fff; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+  #confirm .yes { background: var(--green); } #confirm .no { background: #b33; }
+
+  footer { display: flex; gap: 8px; padding: 10px; background: var(--footer-bg); align-items: center; min-width: 0; }
+  footer input { flex: 1 1 0; min-width: 0; font-size: 17px; padding: 12px 14px; border-radius: 22px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text); outline: none; }
+  footer button { flex: 0 0 46px; width: 46px; height: 46px; border-radius: 50%; border: 0; cursor: pointer; background: var(--btn-bg); color: var(--btn-fg); box-shadow: 0 1px 2px var(--shadow); display: grid; place-items: center; }
+  footer button.send { background: var(--green); color: #fff; }
+  footer button.recording { background: #d33; color: #fff; animation: pulse 1s infinite; }
+  footer select { flex: 0 1 140px; min-width: 0; font-size: 13px; padding: 8px; border-radius: 10px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text); }
+  @keyframes pulse { 50% { transform: scale(1.1); } }
+
+  /* ---------- log panel ---------- */
+  #log { background: var(--log-bg); color: var(--log-fg); height: 100vh; min-width: 0; display: flex; flex-direction: column; font-family: "JetBrains Mono", "Fira Code", ui-monospace, Menlo, monospace; }
+  #log .top { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--log-border); font-size: 13px; color: var(--log-dim); flex-wrap: wrap; }
+  #log .top strong { color: var(--log-fg); font-size: 15px; }
+  #log .top .actions { margin-left: auto; display: flex; gap: 6px; }
+  #log .top button { background: var(--log-btn-bg); color: var(--log-btn-fg); border: 1px solid var(--log-btn-border); border-radius: 6px; padding: 5px 8px; cursor: pointer; font-family: inherit; font-size: 12px; }
+  #log .top button:hover { filter: brightness(1.08); }
+  #events { flex: 1; overflow-y: auto; padding: 10px 14px; display: flex; flex-direction: column; gap: 6px; font-size: var(--log-font); }
+  .event { border-left: 3px solid var(--event-default); padding: 6px 10px; background: var(--event-bg); border-radius: 0 6px 6px 0; box-shadow: 0 1px 1px var(--shadow); }
+  .event .head { display: flex; gap: 8px; align-items: baseline; }
+  .event .tag { font-size: 11px; padding: 1px 6px; border-radius: 4px; background: #2a3947; color: var(--tag-fg); text-transform: uppercase; letter-spacing: .04em; }
+  .event .title { font-weight: 600; }
+  .event .time { margin-left: auto; color: var(--log-dim); font-size: 11px; }
+  .event pre { margin: 6px 0 0; white-space: pre-wrap; word-break: break-word; color: var(--event-fg); font-size: calc(var(--log-font) - 1px); max-height: 260px; overflow: auto; }
+  .event.user_message { border-color: #25D366; } .event.user_message .tag { background: #1d5c3a; }
+  .event.input_guard, .event.output_guard { border-color: #8e6bff; } .event.input_guard .tag, .event.output_guard .tag { background: #3d2f7a; }
+  .event.llm { border-color: #3aa0ff; } .event.llm .tag { background: #1c4a75; }
+  .event.tool_call { border-color: #ffb020; } .event.tool_call .tag { background: #7a5410; }
+  .event.tool_result { border-color: #ffd166; } .event.tool_result .tag { background: #6f5a1f; }
+  .event.template { border-color: #ff7ab6; } .event.template .tag { background: #7a2f55; }
+  .event.reply { border-color: #4dd0e1; } .event.reply .tag { background: #1b5b66; }
+  .event.error, .event.failed { border-color: #ff4d4f; background: var(--error-bg); } .event.error .tag, .event.failed .tag { background: #7a1f22; }
+  .event.duplicate { border-color: #ff4d4f; }
+  #statement { display: none; border-top: 1px solid var(--log-border); padding: 10px 14px; max-height: 40vh; overflow: auto; font-size: 13px; }
+  #statement table { width: 100%; border-collapse: collapse; } #statement td, #statement th { padding: 4px 6px; border-bottom: 1px solid var(--log-border); text-align: left; }
+  #statement .debit { color: #e0483f; } #statement .credit { color: #1f9d55; }
+  :root[data-theme="dark"] #statement .debit { color: #ff8a80; } :root[data-theme="dark"] #statement .credit { color: #8ef0a2; }
+  #statement h3 { margin: 0 0 6px; font-size: 14px; color: var(--log-fg); }
+  .shown { display: block !important; }
+  @media (max-width: 860px) {
+    body { grid-template-columns: 1fr; grid-template-rows: 62vh 38vh; }
+    #phone, #log { height: 100%; }
+    #phone { border-right: 0; border-bottom: 1px solid var(--log-border); }
+  }
+</style>
+</head>
+<body>
+  <section id="phone">
+    <header>
+      <div class="avatar"><i data-lucide="landmark"></i></div>
+      <div>
+        <div class="name">Dev + Eficiente (Banking)</div>
+        <div class="status" id="status">conectando…</div>
+      </div>
+      <div class="actions">
+        <button id="btn-theme" title="Tema claro/escuro"><i data-lucide="moon"></i></button>
+        <button id="btn-font" title="Aumentar fonte"><i data-lucide="a-large-small"></i></button>
+        <button id="btn-log" title="Mostrar/ocultar log"><i data-lucide="terminal"></i></button>
+        <button id="btn-reset" title="Restaurar o estado inicial da demo"><i data-lucide="rotate-ccw"></i></button>
+      </div>
+    </header>
+    <div id="messages"></div>
+    <div class="typing" id="typing"><span></span><span></span><span></span></div>
+    <div id="confirm">
+      <button class="yes" id="btn-yes"><i data-lucide="check"></i> Sim, confirmo</button>
+      <button class="no" id="btn-no"><i data-lucide="x"></i> Não</button>
+    </div>
+    <footer>
+      <button id="btn-attach" title="Enviar foto de boleto ou código Pix"><i data-lucide="paperclip"></i></button>
+      <input type="file" id="file" accept="image/*" hidden>
+      <input id="input" type="text" placeholder="Mensagem" autocomplete="off">
+      <select id="microphones" title="Escolher microfone" hidden></select>
+      <button id="btn-mic" title="Gravar áudio"><i data-lucide="mic"></i></button>
+      <button id="btn-send" class="send" title="Enviar"><i data-lucide="send-horizontal"></i></button>
+    </footer>
+  </section>
+
+  <aside id="log">
+    <div class="top">
+      <strong>tool calls · por dentro da máquina</strong>
+      <span id="model"></span>
+      <div class="actions">
+        <button id="btn-statement">extrato / ledger</button>
+        <button id="btn-resend" title="Reenvia a última confirmação (requisição duplicada)">↻ reenviar confirmação</button>
+        <button id="btn-clear">limpar</button>
+      </div>
+    </div>
+    <div id="events"></div>
+    <div id="statement"></div>
+  </aside>
+
+<script>
+window.addEventListener("error", (e) => {
+  const status = document.getElementById("status");
+  if (status) status.textContent = "erro no front: " + e.message;
+});
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const setIcon = (el, name) => { el.innerHTML = `<i data-lucide="${name}"></i>`; lucide.createIcons({ nodes: el.querySelectorAll("[data-lucide]") }); };
+  const messages = $("messages"), events = $("events"), input = $("input"), typing = $("typing");
+  // crypto.randomUUID só existe em contexto seguro (HTTPS/localhost); pela rede em HTTP não.
+  const newId = () => (crypto.randomUUID ? crypto.randomUUID() : "s-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 10));
+  const storage = {
+    get: (key) => { try { return localStorage.getItem(key); } catch (e) { return null; } },
+    set: (key, value) => { try { localStorage.setItem(key, value); } catch (e) {} },
+    remove: (key) => { try { localStorage.removeItem(key); } catch (e) {} },
+  };
+  let sessionId = storage.get("sessionId");
+  if (!sessionId) { sessionId = newId(); storage.set("sessionId", sessionId); }
+  let ws, lastIntent = null, baseFont = 18;
+
+  const systemDark = () => window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const currentTheme = () => document.documentElement.dataset.theme || (systemDark() ? "dark" : "light");
+  function applyTheme(theme) {
+    document.documentElement.dataset.theme = theme;
+    storage.set("theme", theme);
+    setIcon($("btn-theme"), theme === "dark" ? "sun" : "moon");
+  }
+  const savedTheme = storage.get("theme");
+  if (savedTheme) document.documentElement.dataset.theme = savedTheme;
+  lucide.createIcons();
+  setIcon($("btn-theme"), currentTheme() === "dark" ? "sun" : "moon");
+  $("btn-theme").onclick = () => applyTheme(currentTheme() === "dark" ? "light" : "dark");
+
+  const timeOf = (iso) => new Date(iso || Date.now()).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  const brl = (cents) => (cents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+  function bubble(text, role, extra) {
+    const el = document.createElement("div");
+    el.className = "bubble " + role + (extra ? " " + extra : "");
+    el.textContent = text;
+    const time = document.createElement("span"); time.className = "time"; time.textContent = timeOf();
+    el.appendChild(time);
+    messages.appendChild(el); messages.scrollTop = messages.scrollHeight;
+    return el;
+  }
+  function bubbleImage(file, caption) {
+    const el = document.createElement("div");
+    el.className = "bubble user image" + (caption ? " captioned" : "");
+    const url = URL.createObjectURL(file);
+    const img = document.createElement("img"); img.src = url; img.alt = caption || file.name;
+    img.onclick = () => window.open(url, "_blank");
+    el.appendChild(img);
+    if (caption) { const c = document.createElement("span"); c.className = "caption"; c.textContent = caption; el.appendChild(c); }
+    const time = document.createElement("span"); time.className = "time"; time.textContent = timeOf();
+    el.appendChild(time);
+    messages.appendChild(el); messages.scrollTop = messages.scrollHeight;
+  }
+  function bubbleWithSource(text, source) {
+    const el = bubble(text, "user");
+    const label = document.createElement("span"); label.className = "source"; label.textContent = source;
+    el.prepend(label);
+  }
+  function logEvent(ev, extraClass) {
+    const el = document.createElement("div");
+    el.className = "event " + ev.kind + (ev.ok === false ? " failed" : "") + (extraClass ? " " + extraClass : "");
+    el.innerHTML = `<div class="head"><span class="tag">${ev.kind.replace("_", " ")}</span><span class="title"></span><span class="time">${timeOf(ev.ts)}</span></div>`;
+    el.querySelector(".title").textContent = ev.title;
+    if (ev.detail) { const pre = document.createElement("pre"); pre.textContent = ev.detail; el.appendChild(pre); }
+    events.appendChild(el); events.scrollTop = events.scrollHeight;
+  }
+  function showTyping(on) { typing.style.display = on ? "block" : "none"; messages.scrollTop = messages.scrollHeight; }
+  function showConfirm(on) { $("confirm").style.display = on ? "flex" : "none"; }
+
+  function connect() {
+    const proto = location.protocol === "https:" ? "wss" : "ws";
+    ws = new WebSocket(`${proto}://${location.host}/ws/${sessionId}`);
+    ws.onopen = () => { if (!$("status").textContent.startsWith("online")) $("status").textContent = "online"; };
+    ws.onclose = () => { $("status").textContent = "reconectando…"; setTimeout(connect, 1500); };
+    ws.onmessage = (m) => {
+      const frame = JSON.parse(m.data);
+      if (frame.kind === "event") {
+        if (frame.event.kind === "typing") { showTyping(true); return; }
+        logEvent(frame.event);
+      } else if (frame.kind === "reply") {
+        showTyping(false);
+        bubble(frame.reply.mensagem, "agent", frame.reply.acao);
+        if (frame.reply.acao === "pedir_confirmacao" && frame.reply.intent_id) { lastIntent = frame.reply.intent_id; showConfirm(true); }
+        else { showConfirm(false); }
+      } else if (frame.kind === "error") {
+        showTyping(false); bubble(frame.message, "system");
+      }
+    };
+  }
+
+  function sendText(text, source) {
+    if (!text.trim() || !ws || ws.readyState !== 1) return;
+    if (source === "audio") bubbleWithSource(text, "áudio transcrito"); else bubble(text, "user");
+    ws.send(JSON.stringify({ kind: "text", text, source: source || "keyboard" }));
+    input.value = "";
+  }
+  $("btn-send").onclick = () => sendText(input.value);
+  input.addEventListener("keydown", (e) => { if (e.key === "Enter") sendText(input.value); });
+  $("btn-yes").onclick = () => { showConfirm(false); sendText("sim"); };
+  $("btn-no").onclick = () => { showConfirm(false); sendText("não"); };
+
+  // ---- áudio: MediaRecorder → /api/audio (Whisper na Groq) → fluxo normal
+  let recorder = null, chunks = [];
+  const micSelect = $("microphones");
+  const micConstraint = () => { const id = storage.get("microphone") || ""; return id ? { deviceId: { exact: id } } : true; };
+  // Os nomes dos dispositivos só aparecem depois da primeira permissão; por isso a lista é montada após gravar.
+  async function listMicrophones() {
+    const devices = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === "audioinput");
+    if (devices.length < 2) return;
+    const current = storage.get("microphone") || "";
+    micSelect.innerHTML = devices.map((d, i) => `<option value="${d.deviceId}"${d.deviceId === current ? " selected" : ""}>${d.label || "Microfone " + (i + 1)}</option>`).join("");
+    micSelect.hidden = false;
+  }
+  micSelect.onchange = () => storage.set("microphone", micSelect.value);
+  $("btn-mic").onclick = async () => {
+    const btn = $("btn-mic");
+    if (recorder && recorder.state === "recording") { recorder.stop(); return; }
+    try {
+      if (!navigator.mediaDevices) throw new Error("gravação exige HTTPS ou localhost (contexto seguro)");
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: micConstraint() });
+      await listMicrophones();
+      chunks = [];
+      // Chrome/Firefox gravam webm; Safari grava mp4. Whisper na Groq aceita os dois.
+      const formats = [["audio/webm", "webm"], ["audio/mp4", "m4a"], ["audio/ogg", "ogg"]];
+      const [mime, extension] = formats.find(([m]) => MediaRecorder.isTypeSupported(m)) || ["", "webm"];
+      recorder = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
+      recorder.ondataavailable = (e) => chunks.push(e.data);
+      recorder.onstop = async () => {
+        stream.getTracks().forEach((t) => t.stop());
+        btn.classList.remove("recording"); setIcon(btn, "mic");
+        const blob = new Blob(chunks, { type: recorder.mimeType || mime });
+        const form = new FormData(); form.append("file", blob, "audio." + extension);
+        showTyping(true);
+        const r = await fetch("/api/audio", { method: "POST", body: form });
+        showTyping(false);
+        if (!r.ok) { bubble("não consegui transcrever o áudio", "system"); return; }
+        const { text } = await r.json();
+        logEvent({ kind: "llm", title: "Whisper (Groq) · transcrição", detail: text, ts: new Date().toISOString() });
+        sendText(text, "audio");
+      };
+      recorder.start(); btn.classList.add("recording"); setIcon(btn, "square");
+    } catch (err) { bubble("microfone indisponível: " + err.message, "system"); }
+  };
+
+  // ---- documento: imagem → /api/document (visão na Groq) → mensagem demarcada como dado
+  $("btn-attach").onclick = () => $("file").click();
+  $("file").onchange = async (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    const form = new FormData(); form.append("file", f, f.name);
+    bubbleImage(f, f.name);
+    showTyping(true);
+    const r = await fetch("/api/document", { method: "POST", body: form });
+    if (!r.ok) { showTyping(false); bubble("não consegui ler o documento", "system"); e.target.value = ""; return; }
+    const { document: doc } = await r.json();
+    logEvent({ kind: "llm", title: "visão (Groq) · dados extraídos do documento", detail: JSON.stringify(doc, null, 2), ts: new Date().toISOString() });
+    ws.send(JSON.stringify({ kind: "document", document: doc }));
+    e.target.value = "";
+  };
+
+  // ---- painel
+  $("btn-clear").onclick = () => { events.innerHTML = ""; };
+  $("btn-log").onclick = () => document.body.classList.toggle("no-log");
+  $("btn-font").onclick = () => { baseFont = baseFont >= 26 ? 18 : baseFont + 2; document.documentElement.style.setProperty("--chat-font", baseFont + "px"); document.documentElement.style.setProperty("--log-font", (baseFont - 4) + "px"); };
+  $("btn-reset").onclick = async () => {
+    if (!confirm("Restaurar o estado inicial da demo?")) return;
+    await fetch("/api/admin/reset", { method: "POST" });
+    storage.remove("sessionId");
+    location.reload();
+  };
+  $("btn-resend").onclick = async () => {
+    if (!lastIntent) { bubble("nenhuma confirmação para reenviar ainda", "system"); return; }
+    const r = await fetch(`/api/intents/${lastIntent}/resend-confirmation`, { method: "POST" });
+    const data = await r.json();
+    (data.events || []).forEach((ev) => logEvent(ev, "duplicate"));
+    bubble("(requisição duplicada) " + data.message, "system");
+  };
+  $("btn-statement").onclick = async () => {
+    const box = $("statement");
+    if (box.classList.contains("shown")) { box.classList.remove("shown"); return; }
+    const r = await fetch("/api/statement"); const data = await r.json();
+    const rows = data.entries.map((entry) => `<tr><td>${entry.id}</td><td class="${entry.direction}">${entry.direction === "debit" ? "−" : "+"}${brl(entry.amount_cents)}</td><td>${entry.counterparty}</td><td>${entry.intent_id ? entry.intent_id.slice(0, 8) + "…" : "seed"}</td><td>${timeOf(entry.created_at)}</td></tr>`).join("");
+    box.innerHTML = `<h3>${data.user} · saldo derivado: ${brl(data.balance_cents)}</h3><table><tr><th>id</th><th>valor</th><th>contraparte</th><th>intent</th><th>quando</th></tr>${rows}</table>`;
+    box.classList.add("shown");
+  };
+
+  fetch("/api/session").then((r) => r.json()).then((s) => { $("model").textContent = s.model; $("status").textContent = `online · ${s.user}`; }).catch(() => {});
+  bubble("Oi! Sou o assistente do seu banco. Posso ver saldo, fazer Pix e pagar boletos. Toda transferência só sai com o seu sim.", "agent");
+  connect();
+})();
+</script>
+</body>
+</html>

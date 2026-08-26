@@ -1,0 +1,9 @@
+# anti-slop-py layer 3: Flake8 scoped to the anti-slop rules (ASP core,
+# ASD pydantic group, ASF fastapi group) plus flake8-pydantic (PYD).
+# Ruff stays the primary linter; Flake8 only carries what Ruff can't express.
+# Rules come from the anti-slop-py package entry points (no vendored copy).
+[flake8]
+select = ASP,ASD,ASF,PYD
+# ASD/ASF are off_by_default plugins; select alone does not run them.
+enable-extensions = ASD,ASF
+extend-exclude = .venv

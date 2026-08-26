@@ -22,11 +22,11 @@ O canal é uma camada trocável: `channels/base.py` define o contrato (`Processo
 
 ## Setup
 
-Você precisa de Docker com Compose e de uma chave da [Groq](https://console.groq.com) (o tier gratuito serve; veja a nota de rate limit no fim desta seção). Nada mais é instalado na máquina: Python, dependências e Postgres vivem nos containers.
+Você precisa de Docker com Compose e de uma chave da [Groq](https://console.groq.com) (o tier gratuito serve). Nada mais é instalado na máquina: Python, dependências e Postgres vivem no docker.
 
 ```bash
-git clone <este repositório> && cd banking-ai
-cp .env.example .env          # edite e coloque sua GROQ_API_KEY
+git clone git@github.com:infoslack/banking-ai.git && cd banking-ai
+cp .env.example .env          # edite e insira sua GROQ_API_KEY
 docker compose up --build     # Postgres + app
 ```
 

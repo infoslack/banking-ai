@@ -84,7 +84,7 @@ Transferências seguem um two-phase commit. Propor grava uma linha em `intents` 
 
 ## As tools do agente
 
-Os schemas estão em `src/banking_ai/models.py`; o registro e a execução em `src/banking_ai/tools.py`. O formato OpenAI (`tools=[...]`) é gerado direto de `model_json_schema()`.
+Os schemas estão em `src/banking_ai/models/tools.py`; o registro e a execução em `src/banking_ai/tools.py`. O formato OpenAI (`tools=[...]`) é gerado direto de `model_json_schema()`.
 
 | Tool | Parâmetros | Quando o modelo chama | O que acontece no backend |
 |---|---|---|---|

@@ -1,14 +1,10 @@
 """Templates com dados do banco. Números, chaves e listas de contatos nunca saem da prosa do LLM."""
 
-from banking_ai.models import (
+from banking_ai.models.domain import Balance, BoletoPayload, ConfirmationResult, Intent, PixPayload
+from banking_ai.models.reply import RefusalReason
+from banking_ai.models.tools import (
     BOLETO_LIMIT_CENTS,
     PIX_LIMIT_CENTS,
-    Balance,
-    BoletoPayload,
-    ConfirmationResult,
-    Intent,
-    PixPayload,
-    RefusalReason,
     ToolError,
     ToolResult,
     UnresolvedRecipient,

@@ -3,7 +3,7 @@
 from groq.types.chat import ChatCompletionMessageParam
 
 from banking_ai.guards import Guards
-from banking_ai.models import AgentReply
+from banking_ai.models.reply import AgentReply
 
 
 class FixedScorer:

@@ -14,7 +14,7 @@ from psycopg.rows import class_row
 from psycopg.types.json import Jsonb
 from pydantic import BaseModel
 
-from banking_ai.models import (
+from banking_ai.models.domain import (
     Account,
     Balance,
     BoletoPayload,
@@ -165,11 +165,7 @@ def _credit_account(payload: IntentPayload) -> UUID:
 async def confirm_intent(conn: AsyncConnection, intent_id: UUID, user_id: UUID) -> ConfirmationResult:
     """Fase 2: executa o payload GRAVADO NO BANCO, nunca valores reinterpretados.
 
-    Numa transação: trava a intent e a conta de origem (FOR UPDATE), confere o
-    saldo derivado, insere o lançamento e marca a intent. Uma segunda chamada
-    encontra a intent já confirmada; se algo escapar do lock, o UNIQUE
-    (intent_id) barra o segundo lançamento (o INSERT roda num savepoint para
-    a violação não derrubar a transação externa).
+    O INSERT roda num savepoint: o UNIQUE (intent_id) barra a duplicata sem derrubar a transação.
     """
     async with conn.transaction():
         async with conn.cursor(row_factory=class_row(Intent)) as cur:

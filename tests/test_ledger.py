@@ -7,7 +7,7 @@ from psycopg.errors import UniqueViolation
 from psycopg_pool import AsyncConnectionPool
 
 from banking_ai import ledger
-from banking_ai.models import Account, BoletoPayload, Contact, PixPayload
+from banking_ai.models.domain import Account, BoletoPayload, Contact, PixPayload
 
 ALBERTO_SOUZA_PIX_KEY = "+5511999990001"
 

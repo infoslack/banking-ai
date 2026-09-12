@@ -12,15 +12,12 @@ from psycopg import AsyncConnection
 from pydantic import BaseModel, ValidationError
 
 from banking_ai import ledger
-from banking_ai.models import (
-    Account,
-    Balance,
-    BoletoPayload,
+from banking_ai.models.domain import Account, Balance, BoletoPayload, PixPayload
+from banking_ai.models.tools import (
     CheckBalance,
     ContactsFound,
     IntentProposal,
     PayBoleto,
-    PixPayload,
     SearchContact,
     SendPix,
     ToolError,
@@ -28,6 +25,7 @@ from banking_ai.models import (
     ToolResult,
     UnresolvedRecipient,
 )
+from banking_ai.prompts import INTENT_PENDING_NOTE, UNKNOWN_TOOL_NOTE
 
 
 def tool_spec(name: ToolName, model: type[BaseModel]) -> ChatCompletionToolParam:
@@ -97,12 +95,7 @@ class ToolExecutor:
                     return ToolError(
                         codigo="ferramenta_desconhecida",
                         ferramenta=name,
-                        detalhes=[
-                            (
-                                "Essa ferramenta não existe. Existem apenas consultar_saldo, buscar_contato, enviar_pix e "
-                                "pagar_boleto. Para recusar ou pedir esclarecimento, use o campo acao da resposta final."
-                            )
-                        ],
+                        detalhes=[UNKNOWN_TOOL_NOTE],
                     )
         except ValidationError as exc:
             return validation_error(name, exc)
@@ -146,5 +139,5 @@ class ToolExecutor:
             valor_centavos=payload.valor_centavos,
             destinatario=recipient_name,
             expira_em=intent.expira_em,
-            observacao="Intent pendente; nada foi executado. O sistema pedirá a confirmação ao usuário.",
+            observacao=INTENT_PENDING_NOTE,
         )

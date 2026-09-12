@@ -1,7 +1,8 @@
 from datetime import UTC, datetime
 from uuid import uuid4
 
-from banking_ai.models import Balance, ConfirmationResult, Contact, Intent, PixPayload, ToolError, UnresolvedRecipient
+from banking_ai.models.domain import Balance, ConfirmationResult, Contact, Intent, PixPayload
+from banking_ai.models.tools import ToolError, UnresolvedRecipient
 from banking_ai.render import (
     confirmation_text,
     execution_text,

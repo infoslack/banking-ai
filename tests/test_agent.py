@@ -7,7 +7,8 @@ from psycopg_pool import AsyncConnectionPool
 from banking_ai import ledger
 from banking_ai.agent import Agent, document_message, interpret_confirmation, is_complete_boleto
 from banking_ai.guards import Guards
-from banking_ai.models import Account, AgentReply, ExtractedDocument
+from banking_ai.models.domain import Account
+from banking_ai.models.reply import AgentReply, ExtractedDocument
 from banking_ai.session import Session
 from tests.conftest import EventCollector, FakeCall, FakeLLM, plain_round, tool_round
 

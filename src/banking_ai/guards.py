@@ -1,8 +1,4 @@
-"""Guardrails AI: a camada probabilística (formato, injection, PII).
-
-As garantias financeiras duras continuam sendo Pydantic + regras
-determinísticas + Postgres. Aqui ficam os validators declarativos.
-"""
+"""Guardrails AI: a camada probabilística (formato, injection, PII); as garantias duras são código e Postgres."""
 
 import re
 from collections.abc import Awaitable, Callable
@@ -14,7 +10,7 @@ from guardrails.errors import ValidationError as GuardrailsValidationError
 from guardrails.validator_base import FailResult, PassResult, ValidationResult, Validator, register_validator
 from pydantic import BaseModel
 
-from banking_ai.models import AgentReply
+from banking_ai.models.reply import AgentReply
 
 SCORE_KEY = "injection_score"
 
@@ -74,17 +70,12 @@ class InvalidOutput(Exception):
 
 
 class Reask(Protocol):
-    """Callable de reask no formato que o Guardrails exige: `messages` keyword-only e **kwargs.
-
-    O Guardrails monta as próprias mensagens (instrução de correção + schema) e
-    não repassa o histórico; quem fornece o contexto real é o callable.
-    """
+    """Reask no formato do Guardrails: `messages` keyword-only e **kwargs; o contexto real vem do callable."""
 
     async def __call__(self, *, messages: list[ChatCompletionMessageParam], **llm_params: float | str | None) -> str: ...
 
 
-# O Guardrails exige `messages` com conteúdo string só para existir; o histórico
-# com tool calls não cabe no modelo dele e vai pelo callable de reask.
+# O histórico com tool calls não cabe no modelo do Guardrails; vai pelo callable de reask.
 PLACEHOLDER_MESSAGES: list[ChatCompletionMessageParam] = [
     {"role": "user", "content": "Gere a resposta final conforme o schema."}
 ]

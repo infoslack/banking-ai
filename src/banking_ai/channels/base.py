@@ -9,7 +9,7 @@ from typing import Literal, Protocol
 from pydantic import BaseModel
 
 from banking_ai.events import Emitter
-from banking_ai.models import AgentReply, ExtractedDocument
+from banking_ai.models.reply import AgentReply, ExtractedDocument
 from banking_ai.session import Session
 
 

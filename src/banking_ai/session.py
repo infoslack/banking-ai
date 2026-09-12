@@ -5,7 +5,7 @@ from uuid import UUID
 
 from groq.types.chat import ChatCompletionMessageParam
 
-from banking_ai.models import Account
+from banking_ai.models.domain import Account
 
 
 @dataclass

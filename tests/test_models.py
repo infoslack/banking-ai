@@ -3,8 +3,9 @@
 import pytest
 from pydantic import ValidationError
 
-from banking_ai.llm import REPLY_FORMAT, strict_flat_schema
-from banking_ai.models import PIX_LIMIT_CENTS, AgentReply, CheckBalance, PayBoleto, SendPix
+from banking_ai.llm.formats import REPLY_FORMAT, strict_flat_schema
+from banking_ai.models.reply import AgentReply
+from banking_ai.models.tools import PIX_LIMIT_CENTS, CheckBalance, PayBoleto, SendPix
 from banking_ai.tools import TOOL_SPECS
 
 
@@ -63,7 +64,7 @@ def test_strict_reply_schema_meets_groq_rules() -> None:
 
 
 def test_salvage_reply_from_groq_json_validate_failed() -> None:
-    from banking_ai.llm import GroqErrorDetail, salvage_reply
+    from banking_ai.llm.recovery import GroqErrorDetail, salvage_reply
 
     failed = (
         '[\n{"acao":"recusar","intent_id":null,"mensagem":"Encaminho sua solicitação.","motivo_recusa":"atendimento_humano"},'

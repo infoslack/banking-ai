@@ -8,7 +8,8 @@ from pydantic import BaseModel, Field, TypeAdapter, ValidationError
 
 from banking_ai.channels.base import DocumentMessage, Processor, TextMessage
 from banking_ai.events import LogEvent
-from banking_ai.models import Account, AgentReply
+from banking_ai.models.domain import Account
+from banking_ai.models.reply import AgentReply
 from banking_ai.session import SessionManager
 
 ClientMessage = Annotated[TextMessage | DocumentMessage, Field(discriminator="kind")]

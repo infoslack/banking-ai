@@ -13,8 +13,9 @@ from psycopg_pool import AsyncConnectionPool, PoolTimeout
 from banking_ai import ledger
 from banking_ai.db import create_pool, prepare_database, reset_demo
 from banking_ai.events import LogEvent
-from banking_ai.llm import ToolRequested
-from banking_ai.models import Account, AgentReply
+from banking_ai.llm.recovery import ToolRequested
+from banking_ai.models.domain import Account
+from banking_ai.models.reply import AgentReply
 
 DATABASE_URL = os.environ.get("TEST_DATABASE_URL", "postgresql://banking:banking@localhost:5433/banking")
 DANIEL_PIX_KEY = "daniel@email.com"

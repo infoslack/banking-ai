@@ -11,7 +11,7 @@ from starlette.testclient import WebSocketTestSession
 
 from banking_ai.app import app
 from banking_ai.events import LogEvent
-from banking_ai.models import AgentReply
+from banking_ai.models.reply import AgentReply
 
 pytestmark = pytest.mark.skipif(os.environ.get("RUN_INTEGRATION") != "1", reason="integração com a Groq (RUN_INTEGRATION=1)")
 

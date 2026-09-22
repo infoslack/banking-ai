@@ -1,0 +1,138 @@
+<title>Arquitetura banking-ai</title>
+<style>
+  :root {
+    --bg: #F6F7F9; --card: #FFFFFF; --ink: #1B2430; --muted: #5B6673; --line: #D9DEE4;
+    --guard-bg: #F3EEFF; --guard-bd: #7A5AF5;
+    --llm-bg: #E6F0FF;  --llm-bd: #2F6FD6;
+    --code-bg: #E8EEF4; --code-bd: #3B5B7A;
+    --tpl-bg: #FDE7F0;  --tpl-bd: #C2417A;
+    --groq: #F47B20; --groq-bg: #FFF1E6;
+    --pg: #336791; --wa: #075E54; --wa-bubble: #DCF8C6;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 15px; padding: 28px 16px; }
+  .board { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 250px 1fr 300px; gap: 28px; }
+  .col-title { font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+  .card { background: var(--card); border: 1.5px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+  .card h3 { margin: 0; font-size: 15px; }
+  .card p { margin: 4px 0 0; font-size: 13px; color: var(--muted); line-height: 1.35; }
+  .guard { background: var(--guard-bg); border-color: var(--guard-bd); }
+  .llm   { background: var(--llm-bg);  border-color: var(--llm-bd); }
+  .code  { background: var(--code-bg); border-color: var(--code-bd); }
+  .tpl   { background: var(--tpl-bg);  border-color: var(--tpl-bd); }
+  .down { text-align: center; color: var(--muted); font-size: 14px; line-height: 1; margin: 6px 0; }
+  .badge { float: right; margin: -2px -4px 4px 8px; background: var(--groq); color: #fff; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
+  .fork { margin-top: 8px; display: grid; gap: 6px; }
+  .fork div { font-size: 13px; background: rgba(255,255,255,.7); border-radius: 8px; padding: 6px 10px; }
+  .fork b { font-weight: 700; }
+  .yes b { color: #1F9D55; } .no b { color: #C2417A; }
+
+  /* canal */
+  .phone { border: 1.5px solid var(--line); border-radius: 14px; overflow: hidden; background: #ECE5DD; }
+  .phone header { background: var(--wa); color: #fff; font-size: 13px; font-weight: 700; padding: 8px 12px; }
+  .phone .msgs { padding: 10px; display: grid; gap: 6px; font-size: 12.5px; }
+  .b { border-radius: 8px; padding: 6px 9px; max-width: 92%; background: #fff; box-shadow: 0 1px 1px rgba(0,0,0,.1); }
+  .me { background: var(--wa-bubble); justify-self: end; }
+  .note { font-size: 12.5px; color: var(--muted); margin-top: 10px; line-height: 1.4; }
+  .chip { display: inline-block; font-size: 12px; border: 1.5px solid var(--groq); color: #8a4a10; background: var(--groq-bg); border-radius: 999px; padding: 2px 9px; margin: 4px 4px 0 0; }
+
+  /* postgres */
+  .db { background: var(--pg); color: #fff; border-radius: 12px; padding: 14px; text-align: center; }
+  .db h3 { margin: 0; font-size: 15px; } .db p { margin: 4px 0 0; font-size: 12.5px; color: #DCE8F3; }
+
+  /* groq strip + legenda */
+  .foot { max-width: 1180px; margin: 24px auto 0; display: grid; grid-template-columns: 250px 1fr; gap: 28px; align-items: start; }
+  .groq-strip { border: 1.5px solid var(--groq); background: var(--groq-bg); border-radius: 12px; padding: 10px 14px 12px; }
+  .groq-strip .col-title { color: #A85A12; margin-bottom: 8px; }
+  .groq-strip .models { display: flex; flex-wrap: wrap; gap: 8px; }
+  .groq-strip span { background: #fff; border: 1px solid var(--groq); border-radius: 8px; padding: 5px 10px; font-size: 12.5px; }
+  .groq-strip code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; font-weight: 700; }
+  .legend { font-size: 12.5px; color: var(--muted); display: grid; gap: 5px; }
+  .sw { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: 6px; border: 1.5px solid; vertical-align: -1px; }
+</style>
+
+<div class="board">
+  <section>
+    <p class="col-title">Canal</p>
+    <div class="phone">
+      <header>Dev + Eficiente (Banking)</header>
+      <div class="msgs">
+        <div class="b me">manda 50 pro alberto</div>
+        <div class="b">Confirma Pix de R$ 50,00 para Alberto Souza? Responda sim ou não.</div>
+        <div class="b me">sim</div>
+        <div class="b">Feito! Saldo: R$ 2.450,00.</div>
+      </div>
+    </div>
+    <p class="note">WhatsApp simulado no navegador; em produção, o WhatsApp real. O agente só vê texto.</p>
+    <span class="chip">áudio → whisper</span>
+    <span class="chip">foto de boleto → qwen (visão)</span>
+  </section>
+
+  <section>
+    <p class="col-title">Agente · uma mensagem de cada vez</p>
+    <div class="card guard"><span class="badge">prompt-guard-2</span>
+      <h3>Check de prompt injection</h3>
+      <p>Classificador devolve um score; ≥ 0,5 recusa sem chamar o LLM.</p>
+    </div>
+    <div class="down">▼</div>
+    <div class="card">
+      <h3>Tem confirmação esperando?</h3>
+      <div class="fork">
+        <div class="yes"><b>sim/não</b> → executa ou cancela direto no Postgres, sem LLM</div>
+        <div class="no"><b>outra coisa</b> → segue para o LLM</div>
+      </div>
+    </div>
+    <div class="down">▼</div>
+    <div class="card llm"><span class="badge">gpt-oss-120b</span>
+      <h3>Tool calling</h3>
+      <p>4 tools: consultar_saldo · buscar_contato · enviar_pix · pagar_boleto. Sem user_id, sem tool de executar.</p>
+    </div>
+    <div class="down">▼</div>
+    <div class="card code">
+      <h3>Validação e execução — código</h3>
+      <p>Pydantic revalida (limite no schema) · resolve o destinatário · registra a transferência pendente no ledger →</p>
+    </div>
+    <div class="down">▼</div>
+    <div class="card">
+      <h3>O sistema já sabe a resposta?</h3>
+      <div class="fork">
+        <div class="yes"><b>sim</b> → texto por template com dados do banco (confirmação, saldo, limite, recusa)</div>
+        <div class="no"><b>não</b> → LLM de novo, JSON com schema strict + máscara de PII <span class="badge" style="float:none">gpt-oss-120b</span></div>
+      </div>
+    </div>
+    <div class="down">▼ resposta + log de cada passo no painel</div>
+  </section>
+
+  <section>
+    <p class="col-title">Código determinístico</p>
+    <div class="card code">
+      <h3>ledger.py</h3>
+      <p>saldo = soma dos lançamentos · transferência em duas fases (pendente → confirmada) · FOR UPDATE · UNIQUE (intent_id)</p>
+    </div>
+    <div class="down">▼</div>
+    <div class="db">
+      <h3>PostgreSQL</h3>
+      <p>contas · intents · lancamentos<br>o último guardrail</p>
+    </div>
+  </section>
+</div>
+
+<div class="foot">
+  <div class="legend">
+    <span><i class="sw" style="background:var(--guard-bg);border-color:var(--guard-bd)"></i>guard probabilístico</span>
+    <span><i class="sw" style="background:var(--llm-bg);border-color:var(--llm-bd)"></i>o LLM decide</span>
+    <span><i class="sw" style="background:var(--code-bg);border-color:var(--code-bd)"></i>código</span>
+    <span><i class="sw" style="background:var(--tpl-bg);border-color:var(--tpl-bd)"></i>texto por template</span>
+    <span><i class="sw" style="background:var(--groq);border-color:var(--groq)"></i>selo = chamada à Groq</span>
+  </div>
+  <div class="groq-strip">
+    <p class="col-title">Groq · única dependência externa</p>
+    <div class="models">
+      <span><code>gpt-oss-120b</code> · conversa</span>
+      <span><code>llama-prompt-guard-2</code> · injection</span>
+      <span><code>qwen3.6-27b</code> · visão</span>
+      <span><code>whisper-large-v3-turbo</code> · áudio</span>
+    </div>
+  </div>
+</div>

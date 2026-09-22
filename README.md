@@ -16,7 +16,9 @@ O que dá para fazer na interface (um front estilo WhatsApp, com um painel ao la
 
 ## Arquitetura
 
-![Arquitetura do banking-ai: canal, agente com guards e loop de tools, ledger determinístico sobre PostgreSQL e os modelos da Groq](docs/architecture.svg)
+![Arquitetura do banking-ai: canal, agente com guards e loop de tools, ledger determinístico sobre PostgreSQL e os modelos da Groq](docs/architecture.png)
+
+O diagrama é gerado de `docs/architecture.html` (HTML/CSS puro; edite lá e tire um novo screenshot).
 
 O canal é uma camada trocável: `channels/base.py` define o contrato (`Processor`, `TextMessage`, `DocumentMessage`) e o front web é um adaptador. WhatsApp ou Telegram entrariam como outro arquivo em `channels/`, sem mexer no agente.
 
